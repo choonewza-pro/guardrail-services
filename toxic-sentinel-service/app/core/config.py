@@ -1,0 +1,53 @@
+from __future__ import annotations
+
+from functools import lru_cache
+from typing import Optional
+
+from pydantic import field_validator
+from pydantic_settings import BaseSettings, SettingsConfigDict
+
+
+class Settings(BaseSettings):
+    model_config = SettingsConfigDict(
+        env_file=".env",
+        env_file_encoding="utf-8",
+        extra="ignore",
+    )
+
+    PORT: int = 8085
+    LOG_LEVEL: str = "INFO"
+
+    API_KEY: str = ""
+
+    DEVICE: Optional[str] = None
+
+    HF_HOME: str = "/app/.cache"
+    MODEL_NAME: str = "pythainlp/wangchanberta-base-att-spm-uncased"
+
+    TOXIC_THRESHOLD: float = 0.5
+    MAX_TEXT_LENGTH: int = 1000
+
+    MAX_CONCURRENT_INFERENCES: int = 1
+
+    CORS_ORIGINS: str = ""
+    ENABLE_DOCS: bool = True
+
+    @field_validator("API_KEY")
+    @classmethod
+    def _validate_api_key(cls, v: str) -> str:
+        if not v or not v.strip():
+            raise ValueError(
+                "API_KEY must be set. Copy .env.example to .env and fill API_KEY."
+            )
+        return v.strip()
+
+    @property
+    def cors_origins_list(self) -> list[str]:
+        if not self.CORS_ORIGINS.strip():
+            return []
+        return [o.strip() for o in self.CORS_ORIGINS.split(",") if o.strip()]
+
+
+@lru_cache
+def get_settings() -> Settings:
+    return Settings()

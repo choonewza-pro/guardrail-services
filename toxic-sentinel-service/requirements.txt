@@ -1,0 +1,10 @@
+fastapi>=0.111,<0.120
+uvicorn[standard]>=0.30,<0.32
+pydantic-settings>=2.5,<3.0
+transformers>=4.44,<5.0
+sentencepiece>=0.2,<0.3
+python-dotenv>=1.0
+# torch is installed separately in the Dockerfile
+# via the CUDA-121 index URL for a smaller image.
+# For local (non-Docker) runs, uncomment the next line:
+# torch>=2.3,<2.5
