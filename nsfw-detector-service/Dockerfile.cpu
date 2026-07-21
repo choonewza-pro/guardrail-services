@@ -1,0 +1,66 @@
+# ===================================================================
+# nsfw-detector-service — CPU image (self-contained, multi-stage)
+# For CPU-only servers (no NVIDIA GPU).
+# Build:  docker compose -f docker-compose-cpu.yml up -d --build
+# ===================================================================
+
+# ---- Stage 1: System + Python + deps (cached layers) -------------
+FROM python:3.11-slim AS deps
+
+ENV DEBIAN_FRONTEND=noninteractive \
+    PYTHONUNBUFFERED=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    HF_HOME=/app/.cache \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1
+
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        libgl1 \
+        libglib2.0-0 \
+        curl \
+    && rm -rf /var/lib/apt/lists/* \
+    && pip install --upgrade pip
+
+WORKDIR /app
+
+# PyTorch CPU wheels (~200MB — much smaller than CUDA)
+RUN pip install torch==2.3.1 torchvision==0.18.1 \
+        --index-url https://download.pytorch.org/whl/cpu
+
+# Non-torch Python deps
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+
+# huggingface_hub + timm (required by Marqo/nsfw-image-detection-384)
+RUN pip install "huggingface_hub>=0.24,<1.0" "timm>=1.0,<2.0"
+
+RUN mkdir -p /app/.cache
+
+# ---- Stage 2: Pre-bake model weights (one-time download) --------
+FROM deps AS model-preload
+
+COPY scripts/preload_model.py /tmp/preload_model.py
+RUN python /tmp/preload_model.py && rm /tmp/preload_model.py
+
+# ---- Stage 3: Final runtime image -------------------------------
+FROM deps AS final
+
+ENV HF_HOME=/app/.cache \
+    TRANSFORMERS_OFFLINE=1
+
+WORKDIR /app
+
+# Copy baked model weights from preload stage (no runtime download)
+COPY --from=model-preload /app/.cache /app/.cache
+
+# Application code (changes often → keep last for max cache hits)
+COPY app/ ./app/
+
+EXPOSE 8085
+
+HEALTHCHECK --interval=30s --timeout=10s --retries=3 --start-period=60s \
+    CMD python -c "import urllib.request,sys; \
+        r=urllib.request.urlopen('http://localhost:${PORT:-8085}/health'); \
+        sys.exit(0 if r.status==200 else 1)"
+
+CMD ["sh", "-c", "uvicorn app.main:app --host 0.0.0.0 --port ${PORT:-8085}"]
