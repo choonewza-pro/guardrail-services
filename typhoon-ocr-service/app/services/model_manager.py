@@ -118,20 +118,21 @@ class ModelManager:
             os.environ["HF_HUB_ENABLE_HF_TRANSFER"] = "1"
 
             logger.info("[Step 1/2] Checking/downloading model weights for '%s'...", self.model_name)
+            local_model_path = self.model_name
             try:
                 from huggingface_hub import snapshot_download
-                snapshot_download(repo_id=self.model_name)
-                logger.info("[Step 1/2 Complete] Model files verified/cached for '%s'.", self.model_name)
+                local_model_path = snapshot_download(repo_id=self.model_name)
+                logger.info("[Step 1/2 Complete] Model files verified/cached at '%s'.", local_model_path)
             except Exception as dl_err:
-                logger.warning("Download check notice: %s. Proceeding to load model...", dl_err)
+                logger.warning("Download check notice: %s. Proceeding with repository name...", dl_err)
 
             logger.info("[Step 2/2] Loading PyTorch tensors into %s memory...", self.device)
             self.processor = AutoProcessor.from_pretrained(
-                self.model_name,
+                local_model_path,
                 trust_remote_code=True,
             )
             self.model = AutoModelForImageTextToText.from_pretrained(
-                self.model_name,
+                local_model_path,
                 dtype=torch_dtype if isinstance(torch_dtype, torch.dtype) else "auto",
                 device_map="auto" if self.device == "cuda" else None,
                 trust_remote_code=True,

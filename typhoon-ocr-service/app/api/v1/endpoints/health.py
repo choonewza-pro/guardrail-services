@@ -6,7 +6,7 @@ router = APIRouter()
 
 
 @router.get("/health", tags=["Health"])
-async def health_check():
+def health_check():
     """
     Public health check endpoint. Returns model status, loading state, and device info.
     """

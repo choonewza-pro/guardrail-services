@@ -51,7 +51,7 @@ async def process_ocr(
 
     # Default parameter values
     question_val = question or ""
-    sys_prompt_val = system_prompt or ""
+    sys_prompt_val = system_prompt if (system_prompt and system_prompt.strip()) else settings.DEFAULT_SYSTEM_PROMPT
     temp_val = temperature if temperature is not None else settings.DEFAULT_TEMPERATURE
     max_tokens_val = max_tokens if max_tokens is not None else settings.DEFAULT_MAX_TOKENS
     seed_val = seed
@@ -79,7 +79,7 @@ async def process_ocr(
                     raise InvalidImageError("JSON payload must contain 'file' or 'image_base64' string.")
 
                 question_val = json_data.get("question") or question_val
-                sys_prompt_val = json_data.get("system_prompt") or sys_prompt_val
+                sys_prompt_val = json_data.get("system_prompt") if (json_data.get("system_prompt") and str(json_data.get("system_prompt")).strip()) else sys_prompt_val
                 if "temperature" in json_data and json_data["temperature"] is not None:
                     temp_val = float(json_data["temperature"])
                 if "max_tokens" in json_data and json_data["max_tokens"] is not None:

@@ -6,7 +6,7 @@ class OCRJSONRequest(BaseModel):
     file: Optional[str] = Field(None, description="Base64 encoded image string or Data URI")
     image_base64: Optional[str] = Field(None, description="Alias for base64 encoded image string")
     question: Optional[str] = Field(None, description="Question or OCR instructions for model")
-    system_prompt: Optional[str] = Field("", description="System prompt instructions")
+    system_prompt: Optional[str] = Field(None, description="System prompt instructions (Optional, defaults to Thai document Markdown OCR prompt)")
     temperature: Optional[float] = Field(0.1, description="Sampling temperature 0.0-2.0")
     max_tokens: Optional[int] = Field(4096, description="Max tokens to generate")
     seed: Optional[int] = Field(None, description="Random seed for deterministic output")
