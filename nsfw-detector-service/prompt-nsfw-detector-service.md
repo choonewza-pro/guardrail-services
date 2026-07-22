@@ -10,7 +10,7 @@
 - ใช้ `pydantic-settings` ในการทำ Configuration Management
 - อ่านค่าพอร์ตจากไฟล์ `.env` ผ่านตัวแปร `PORT` โดยกำหนดค่า Default ไว้ที่ `8085`
 - อ่านค่า API Key จากไฟล์ `.env` ในตัวแปรชื่อ `API_KEY` (เช่น `API_KEY=my_super_secret_key_123`)
-- อ่านค่าสวิตช์เปิด/ปิด GPU จาก `.env` เช่น `USE_GPU=true` หรือ `DEVICE=cuda` (default เป็น cuda หากมีอุปกรณ์พร้อมใช้งาน)
+- อ่านค่าอุปกรณ์ประมวลผลจาก `.env` ผ่านตัวแปร `DEVICE` (รับค่า `auto`/`cuda`/`cpu`, default = `auto` → `cuda` หากมีอุปกรณ์พร้อมใช้งาน, ไม่งั้น `cpu`)
 
 ### 3. ระบบ Authentication (API Key Guard):
 - ใช้ FastAPI `Security` / `HTTPBearer` หรือ `APIKeyHeader` Dependency ในการตรวจ Request
@@ -23,7 +23,7 @@
 
 ### 4. โมเดล AI และ GPU Environment:
 - ใช้โมเดล: `Marqo/nsfw-image-detection-384` ผ่าน `transformers`, `torch`, `torchvision`
-- ตรวจสอบอุปกรณ์ประมวลผลแบบไดนามิก: หาก `USE_GPU=true` และ `torch.cuda.is_available()` ให้เลือกใช้ `cuda` หากไม่พบ ให้ Fallback กลับเป็น `cpu` อัตโนมัติพร้อม Log แจ้งเตือน
+- ตรวจสอบอุปกรณ์ประมวลผลแบบไดนามิก: หาก `DEVICE=auto` หรือ `DEVICE=cuda` และ `torch.cuda.is_available()` ให้เลือกใช้ `cuda` หากไม่พบ ให้ Fallback กลับเป็น `cpu` อัตโนมัติพร้อม Log แจ้งเตือน
 - โหลด/Initialize โมเดลแบบ Singleton Pattern ผ่าน `lifespan` context manager ของ FastAPI เพียงครั้งเดียวตอนสั่ง Start Server
 - กำหนด Cache Directory สำหรับเก็บ Weights โมเดลอย่างชัดเจน ผ่าน Environment Variable `HF_HOME=/app/.cache` เพื่อให้ Mount Volume กับ Docker ได้
 
@@ -57,7 +57,7 @@
 - กรณีเกิด Error อื่นๆ (เช่น ไม่ส่งไฟล์, ไฟล์ใหญ่เกิน, ไฟล์ผิดประเภท - Status 400/500) ให้ส่ง JSON Structure ที่บอกสาเหตุชัดเจน
 
 ### 8. โครงสร้างโปรเจกต์และไฟล์ที่ต้องการ:
-1. `.env.example` (ตัวอย่างไฟล์ตั้งค่า เช่น `PORT=8085`, `API_KEY=your_secret_api_key_here`, `USE_GPU=true`, `HF_HOME=/app/.cache`)
+1. `.env.example` (ตัวอย่างไฟล์ตั้งค่า เช่น `PORT=8085`, `API_KEY=your_secret_api_key_here`, `DEVICE=auto`, `HF_HOME=/app/.cache`)
 2. `requirements.txt` ระบุเวอร์ชันหลักล่าสุดที่เป็นมาตรฐาน:
    - `fastapi`
    - `uvicorn[standard]`

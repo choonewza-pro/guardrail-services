@@ -103,8 +103,7 @@ nsfw-detector-service/
 |---|---|---|---|---|
 | `PORT` | `int` | `8085` | `PORT` | uvicorn bind port |
 | `API_KEY` | `SecretStr` | — | `API_KEY` | ต้อง set; ถ้าว่าง raise ตอน startup |
-| `USE_GPU` | `bool` | `True` | `USE_GPU` | switch GPU on/off |
-| `DEVICE` | `Optional[str]` | `None` | `DEVICE` | override `'cuda'`/`'cpu'` |
+| `DEVICE` | `str` | `"auto"` | `DEVICE` | เลือกอุปกรณ์ประมวลผล `auto`/`cuda`/`cpu`; `auto` = `cuda` หากมี GPU ไม่งั้น `cpu` |
 | `HF_HOME` | `str` | `"/app/.cache"` | `HF_HOME` | HF cache dir; ตั้งค่า env ตอน startup |
 | `MODEL_NAME` | `str` | `"Marqo/nsfw-image-detection-384"` | `MODEL_NAME` | โมเดล HF |
 | `MAX_IMAGE_SIZE_MB` | `int` | `10` | `MAX_IMAGE_SIZE_MB` | จำกัด upload |
@@ -156,7 +155,9 @@ class ModelManager:
         self._lock = threading.Lock()
 
     def _resolve_device(self) -> str:
-        desired = settings.DEVICE or ("cuda" if settings.USE_GPU else "cpu")
+        desired = settings.DEVICE  # "auto"|"cuda"|"cpu"
+        if desired == "auto":
+            desired = "cuda" if torch.cuda.is_available() else "cpu"
         if desired == "cuda" and not torch.cuda.is_available():
             logger.warning("CUDA requested but unavailable → fallback to CPU")
             return "cpu"
