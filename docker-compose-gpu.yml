@@ -1,0 +1,88 @@
+# Root GPU compose — runs both nsfw-detector + toxic-sentinel with NVIDIA GPU.
+# Usage:  docker compose -f docker-compose-gpu.yml up -d --build
+#
+# Prerequisites:
+#   - external network "km4u-network" must exist:
+#       docker network create km4u-network
+#   - NVIDIA Container Toolkit installed on the host
+#   - each service has its own .env (nsfw-detector-service/.env, toxic-sentinel-service/.env)
+
+services:
+  nsfw-detector:
+    build:
+      context: ./nsfw-detector-service
+      dockerfile: Dockerfile.gpu
+    image: nsfw-detector-service:gpu
+    container_name: nsfw-detector
+    env_file: ./nsfw-detector-service/.env
+    ports:
+      - "${NSFW_PORT:-8085}:${NSFW_PORT:-8085}"
+    environment:
+      - USE_GPU=true
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; r=urllib.request.urlopen('http://localhost:${NSFW_PORT:-8085}/health'); sys.exit(0 if r.status==200 else 1)"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - km4u-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+  toxic-sentinel:
+    build:
+      context: ./toxic-sentinel-service
+      dockerfile: Dockerfile.gpu
+    image: toxic-sentinel-service:gpu
+    container_name: toxic-sentinel
+    env_file: ./toxic-sentinel-service/.env
+    ports:
+      - "${TOXIC_PORT:-8086}:${TOXIC_PORT:-8086}"
+    environment:
+      - DEVICE=cuda
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+    volumes:
+      - toxic-hf-cache:/app/.cache
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; r=urllib.request.urlopen('http://localhost:${TOXIC_PORT:-8086}/health'); sys.exit(0 if r.status==200 else 1)"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 60s
+    networks:
+      - km4u-network
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+
+networks:
+  km4u-network:
+    name: "km4u-network"
+    driver: bridge
+    external: true
+
+volumes:
+  toxic-hf-cache:
