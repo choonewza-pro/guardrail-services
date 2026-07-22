@@ -18,7 +18,7 @@ services:
     ports:
       - "${NSFW_PORT:-8085}:${NSFW_PORT:-8085}"
     environment:
-      - USE_GPU=true
+      - DEVICE=cuda
     deploy:
       resources:
         reservations:

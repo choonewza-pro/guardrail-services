@@ -12,7 +12,6 @@ services:
     ports:
       - "${PORT:-8085}:${PORT:-8085}"
     environment:
-      - USE_GPU=false
       - DEVICE=cpu
     restart: unless-stopped
     healthcheck:

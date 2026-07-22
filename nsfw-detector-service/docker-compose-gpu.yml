@@ -12,7 +12,7 @@ services:
     ports:
       - "${PORT:-8085}:${PORT:-8085}"
     environment:
-      - USE_GPU=true
+      - DEVICE=cuda
     deploy:
       resources:
         reservations:

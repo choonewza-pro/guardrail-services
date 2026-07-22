@@ -142,7 +142,7 @@ curl -X POST http://localhost:8085/api/v1/detect-toxic \
 |---|---|---|
 | `PORT` | `8085` | พอร์ต API |
 | `API_KEY` | — | **required** secret key |
-| `DEVICE` | auto | override `cuda`/`cpu` (default: `cuda` ถ้ามี GPU, อย่างอื่น fallback CPU) |
+| `DEVICE` | `auto` | `auto`/`cuda`/`cpu` — `auto` = `cuda` หากมี GPU ไม่งั้น fallback `cpu` |
 | `HF_HOME` | `/app/.cache` | HF cache dir (baked ใน image + mount เป็น volume) |
 | `MODEL_NAME` | `pythainlp/wangchanberta-base-att-spm-uncased` | HuggingFace model |
 | `TOXIC_THRESHOLD` | `0.5` | threshold ตัดสิน `is_toxic` |

@@ -55,10 +55,10 @@ class ModelManager:
     # ------------------------------------------------------------------
     def _resolve_device(self) -> str:
         settings = get_settings()
-        if settings.DEVICE:
-            desired = settings.DEVICE.lower()
-        else:
-            desired = "cuda"
+        desired = settings.DEVICE  # already normalized: "auto"|"cuda"|"cpu"
+
+        if desired == "auto":
+            desired = "cuda" if torch.cuda.is_available() else "cpu"
 
         if desired == "cuda" and not torch.cuda.is_available():
             logger.warning(

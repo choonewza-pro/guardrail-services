@@ -145,8 +145,7 @@ curl -X POST http://localhost:8085/api/v1/detect-nsfw \
 |---|---|---|
 | `PORT` | `8085` | พอร์ต API |
 | `API_KEY` | — | **required** secret key |
-| `USE_GPU` | `true` | เปิด/ปิด GPU (compose ตั้งไว้ให้) |
-| `DEVICE` | auto | override `cuda`/`cpu` |
+| `DEVICE` | `auto` | `auto`/`cuda`/`cpu` — `auto` = `cuda` หากมี GPU ไม่งั้น fallback `cpu` |
 | `HF_HOME` | `/app/.cache` | HF cache dir (baked ใน image) |
 | `MODEL_NAME` | `Marqo/nsfw-image-detection-384` | HuggingFace model |
 | `MAX_IMAGE_SIZE_MB` | `10` | ขนาด upload สูงสุด |

@@ -105,7 +105,7 @@ Every service in this monorepo follows the same internal layout and conventions.
 
 ### Model Management
 - **Singleton** pattern: model loaded once in FastAPI `lifespan` (`model_manager.load()`), unloaded on shutdown (`model_manager.unload()` frees CUDA cache).
-- **Device resolution:** `settings.DEVICE` overrides; else `cuda` if `USE_GPU` and `torch.cuda.is_available()`; else `cpu` with a warning log. Never assume GPU availability.
+- **Device resolution:** `settings.DEVICE` ∈ {`auto`|`cuda`|`cpu`} (default `auto` = `cuda` if `torch.cuda.is_available()` else `cpu`; `cuda` auto-falls back to `cpu` when unavailable with a warning log). Never assume GPU availability.
 - **Inference** runs in a threadpool (`await run_in_threadpool(model_manager.predict, ...)`) to avoid blocking the async event loop.
 - A `threading.Lock` serializes model access when `MAX_CONCURRENT_INFERENCES=1`.
 - Weights are **pre-baked** at Docker build time via `scripts/preload_model.py` → runtime uses `TRANSFORMERS_OFFLINE=1`; container start < 5s.

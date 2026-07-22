@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Optional
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -19,7 +18,7 @@ class Settings(BaseSettings):
 
     API_KEY: str = ""
 
-    DEVICE: Optional[str] = None
+    DEVICE: str = "auto"
 
     HF_HOME: str = "/app/.cache"
     MODEL_NAME: str = "pythainlp/wangchanberta-base-att-spm-uncased"
@@ -40,6 +39,16 @@ class Settings(BaseSettings):
                 "API_KEY must be set. Copy .env.example to .env and fill API_KEY."
             )
         return v.strip()
+
+    @field_validator("DEVICE")
+    @classmethod
+    def _validate_device(cls, v: str) -> str:
+        v = (v or "auto").strip().lower()
+        if v not in {"auto", "cuda", "cpu"}:
+            raise ValueError(
+                f"DEVICE must be one of: auto|cuda|cpu (got {v!r})"
+            )
+        return v
 
     @property
     def cors_origins_list(self) -> list[str]:

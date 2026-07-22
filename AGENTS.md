@@ -73,7 +73,7 @@ Both `.env` files ship with `PORT=8085` by default — changing one service's `.
 
 - `app/main.py` — FastAPI app + `lifespan` that loads the model once at startup (singleton). **Refuses to boot if `API_KEY` is empty.**
 - `app/core/config.py` — `pydantic-settings` reads `.env`. `API_KEY` has a validator that hard-fails on empty values.
-- `app/services/model_manager.py` — Singleton wrapping HuggingFace model. Resolves `DEVICE` (cuda→cpu auto-fallback when `torch.cuda.is_available()` is False). Predictions run under a thread lock.
+- `app/services/model_manager.py` — Singleton wrapping HuggingFace model. Resolves `DEVICE` (values: `auto`|`cuda`|`cpu`; `auto` = `cuda` if `torch.cuda.is_available()` else `cpu`; `cuda` auto-falls back to `cpu` when unavailable). Predictions run under a thread lock.
 - `app/api/deps.py` — `x-api-key` header guard → 401 with the envelope `{"success": false, "error": "Unauthorized: Invalid or missing API key"}`.
 - `app/api/v1/endpoints/detect.py` — the protected detection endpoint.
 - `app/api/v1/endpoints/health.py` — public `GET /health`.

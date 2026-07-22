@@ -17,7 +17,6 @@ services:
     ports:
       - "${NSFW_PORT:-8085}:${NSFW_PORT:-8085}"
     environment:
-      - USE_GPU=false
       - DEVICE=cpu
     restart: unless-stopped
     healthcheck:

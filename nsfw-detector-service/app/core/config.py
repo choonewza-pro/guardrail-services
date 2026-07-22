@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from functools import lru_cache
-from typing import Optional
 
 from pydantic import field_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
@@ -19,8 +18,7 @@ class Settings(BaseSettings):
 
     API_KEY: str = ""
 
-    USE_GPU: bool = True
-    DEVICE: Optional[str] = None
+    DEVICE: str = "auto"
 
     HF_HOME: str = "/app/.cache"
     MODEL_NAME: str = "Marqo/nsfw-image-detection-384"
@@ -44,6 +42,16 @@ class Settings(BaseSettings):
                 "API_KEY must be set. Copy .env.example to .env and fill API_KEY."
             )
         return v.strip()
+
+    @field_validator("DEVICE")
+    @classmethod
+    def _validate_device(cls, v: str) -> str:
+        v = (v or "auto").strip().lower()
+        if v not in {"auto", "cuda", "cpu"}:
+            raise ValueError(
+                f"DEVICE must be one of: auto|cuda|cpu (got {v!r})"
+            )
+        return v
 
     @property
     def allowed_mime_list(self) -> list[str]:

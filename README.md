@@ -132,7 +132,7 @@ curl -X POST http://localhost:8086/api/v1/detect-toxic \
 
 - `app/main.py` — FastAPI app + `lifespan` โหลดโมเดลครั้งเดียวตอน startup (singleton) — **ปฏิเสธบูตถ้า `API_KEY` ว่าง**
 - `app/core/config.py` — `pydantic-settings` อ่าน `.env` มี validator hard-fail ถ้า `API_KEY` ว่าง
-- `app/services/model_manager.py` — singleton ครอบ HuggingFace model ตัดสิน `DEVICE` (cuda→cpu fallback อัตโนมัติเมื่อ CUDA ไม่พร้อม) การทำนายทำภายใต้ thread lock
+- `app/services/model_manager.py` — singleton ครอบ HuggingFace model ตัดสิน `DEVICE` (ค่า: `auto`/`cuda`/`cpu`; `auto` = `cuda` หาก `torch.cuda.is_available()` ไม่งั้น `cpu`; `cuda` auto-fallback เป็น `cpu` เมื่อไม่พร้อม) การทำนายทำภายใต้ thread lock
 - `app/api/deps.py` — guard ผ่าน header `x-api-key` → 401 พร้อม envelope
 - `app/api/v1/endpoints/detect.py` — endpoint ตรวจจับ (protected)
 - `app/api/v1/endpoints/health.py` — `GET /health` (public)
