@@ -11,7 +11,7 @@ class OCRJSONRequest(BaseModel):
     max_tokens: Optional[int] = Field(4096, description="Max tokens to generate")
     seed: Optional[int] = Field(None, description="Random seed for deterministic output")
     max_retries: Optional[int] = Field(3, description="Maximum retry attempts on failure")
-    timeout: Optional[float] = Field(60.0, description="Inference timeout in seconds")
+    timeout: Optional[float] = Field(500.0, description="Inference timeout in seconds")
     is_stream: bool = Field(False, description="Enable Server-Sent Events (SSE) streaming")
 
 

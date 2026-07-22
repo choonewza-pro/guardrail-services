@@ -27,7 +27,7 @@ class Settings(BaseSettings):
 
     DEFAULT_MAX_TOKENS: int = 4096
     DEFAULT_TEMPERATURE: float = 0.1
-    DEFAULT_TIMEOUT: float = 60.0
+    DEFAULT_TIMEOUT: float = 500.0
     DEFAULT_MAX_RETRIES: int = 3
     DEFAULT_SYSTEM_PROMPT: str = (
         "คุณเป็นผู้เชี่ยวชาญด้านการอ่านเอกสารภาษาไทย ให้ถอดรหัสและแปลงเนื้อหาทั้งหมดในเอกสารเป็นรูปแบบ Markdown อย่างถูกต้องแม่นยำ "

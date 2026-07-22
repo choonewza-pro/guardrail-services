@@ -37,7 +37,7 @@ async def process_ocr(
     max_tokens: Optional[int] = Form(default=None, description="Max tokens to generate (Optional, default: 4096)"),
     seed: Optional[int] = Form(default=None, description="Random seed for deterministic output (Optional)"),
     max_retries: Optional[int] = Form(default=None, description="Maximum retry attempts on failure (Optional, default: 3)"),
-    timeout: Optional[float] = Form(default=None, description="Inference timeout in seconds (Optional, default: 60.0)"),
+    timeout: Optional[float] = Form(default=None, description="Inference timeout in seconds (Optional, default: 500.0)"),
     is_stream: Optional[bool] = Form(default=None, description="Enable SSE streaming (Optional, default: False)"),
 ):
     settings = get_settings()
