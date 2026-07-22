@@ -21,7 +21,7 @@ class Settings(BaseSettings):
     DEVICE: str = "auto"
 
     HF_HOME: str = "/app/.cache"
-    MODEL_NAME: str = "pythainlp/wangchanberta-base-att-spm-uncased"
+    MODEL_NAME: str = "airesearch/wangchanberta-base-att-spm-uncased"
 
     TOXIC_THRESHOLD: float = 0.5
     MAX_TEXT_LENGTH: int = 1000

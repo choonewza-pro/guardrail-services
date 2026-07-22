@@ -13,7 +13,7 @@ os.environ.setdefault("TRANSFORMERS_OFFLINE", "0")
 
 from transformers import AutoModelForSequenceClassification, AutoTokenizer
 
-MODEL_NAME = os.environ.get("MODEL_NAME", "pythainlp/wangchanberta-base-att-spm-uncased")
+MODEL_NAME = os.environ.get("MODEL_NAME", "airesearch/wangchanberta-base-att-spm-uncased")
 
 print(f"[preload] Downloading model: {MODEL_NAME}", flush=True)
 print(f"[preload] HF_HOME={os.environ.get('HF_HOME')}", flush=True)
