@@ -257,7 +257,7 @@ class ModelManager:
         max_tokens: int = 4096,
         seed: Optional[int] = None,
         max_retries: int = 3,
-        timeout: float = 60.0,
+        timeout: float = 500.0,
     ) -> Dict[str, Any]:
         """
         Executes sync model inference on threadpool with retry loop and timeout enforcement.
