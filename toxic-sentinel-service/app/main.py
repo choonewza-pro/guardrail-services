@@ -87,7 +87,7 @@ def create_app() -> FastAPI:
     async def _unhandled_exc_handler(request: Request, exc: Exception) -> JSONResponse:
         logger = get_logger("toxic-sentinel.main")
         logger.exception("Unhandled exception on %s %s: %s", request.method, request.url.path, exc)
-        return _envelope_error(500, "Internal Server Error")
+        return _envelope_error(500, f"Internal Server Error: {exc}")
 
     return app
 

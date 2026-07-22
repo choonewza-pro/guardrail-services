@@ -6,6 +6,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.gpu
+      args:
+        - MODEL_NAME=${MODEL_NAME:-typhoon-ai/typhoon2-safety-preview}
     image: toxic-sentinel-service:gpu
     container_name: toxic-sentinel
     env_file: .env

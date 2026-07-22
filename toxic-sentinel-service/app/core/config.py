@@ -25,6 +25,7 @@ class Settings(BaseSettings):
 
     TOXIC_THRESHOLD: float = 0.5
     MAX_TEXT_LENGTH: int = 1000
+    TOXIC_LABEL_INDEX: int | None = None
 
     MAX_CONCURRENT_INFERENCES: int = 1
 

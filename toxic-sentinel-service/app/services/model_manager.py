@@ -31,6 +31,8 @@ _TOXIC_LABEL_HINTS = (
     "offensive",
     "abusive",
     "bad",
+    "harmful",
+    "harm",
 )
 
 
@@ -84,7 +86,11 @@ class ModelManager:
                 settings.MODEL_NAME
             ).to(self.device)
             self.model.eval()
-            self._id2label = dict(self.model.config.id2label)
+            raw = self.model.config.id2label
+            self._id2label = {
+                int(k): v.decode("utf-8") if isinstance(v, bytes) else str(v)
+                for k, v in raw.items()
+            }
             self._toxic_label_idx = self._find_toxic_label_idx()
             elapsed_ms = int((time.perf_counter() - start) * 1000)
             logger.info(
@@ -112,6 +118,13 @@ class ModelManager:
     # Helpers
     # ------------------------------------------------------------------
     def _find_toxic_label_idx(self) -> int | None:
+        settings = get_settings()
+        if settings.TOXIC_LABEL_INDEX is not None:
+            logger.info(
+                "Using TOXIC_LABEL_INDEX=%d (from .env override)",
+                settings.TOXIC_LABEL_INDEX,
+            )
+            return settings.TOXIC_LABEL_INDEX
         for idx, label in self._id2label.items():
             name = str(label).lower()
             if any(hint in name for hint in _TOXIC_LABEL_HINTS):
