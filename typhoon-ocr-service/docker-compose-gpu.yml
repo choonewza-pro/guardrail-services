@@ -1,6 +1,8 @@
 # NVIDIA GPU server (CUDA runtime required).
 # Usage: docker compose -f docker-compose-gpu.yml up -d --build
 
+name: typhoon-ocr-gpu
+
 services:
   typhoon-ocr:
     build:
@@ -10,8 +12,9 @@ services:
     container_name: typhoon-ocr
     env_file: .env.gpu
     ports:
-      - "${PORT:-8087}:${PORT:-8087}"
+      - "8087:8087"
     environment:
+      - PORT=8087
       - DEVICE=cuda
     volumes:
       - hf-cache:/app/.cache
