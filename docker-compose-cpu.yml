@@ -60,6 +60,32 @@ services:
       start_period: 90s
     networks:
       - km4u-network
+  typhoon-ocr:
+    build:
+      context: ./typhoon-ocr-service
+      dockerfile: Dockerfile.cpu
+    image: typhoon-ocr-service:cpu
+    container_name: typhoon-ocr
+    env_file: ./typhoon-ocr-service/.env
+    ports:
+      - "${TYPHOON_PORT:-8087}:${TYPHOON_PORT:-8087}"
+    environment:
+      - DEVICE=cpu
+    volumes:
+      - typhoon-hf-cache:/app/.cache
+    restart: unless-stopped
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request,sys; r=urllib.request.urlopen('http://localhost:${TYPHOON_PORT:-8087}/health'); sys.exit(0 if r.status==200 else 1)"
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 90s
+    networks:
+      - km4u-network
     extra_hosts:
       - "host.docker.internal:host-gateway"
 
@@ -71,3 +97,4 @@ networks:
 
 volumes:
   toxic-hf-cache:
+  typhoon-hf-cache:
