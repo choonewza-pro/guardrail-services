@@ -9,7 +9,7 @@ services:
       context: .
       dockerfile: Dockerfile.gpu
     image: typhoon-ocr-service:gpu
-    container_name: typhoon-ocr
+    container_name: typhoon-ocr-gpu
     env_file: .env.gpu
     ports:
       - "8087:8087"
@@ -17,7 +17,7 @@ services:
       - PORT=8087
       - DEVICE=cuda
     volumes:
-      - hf-cache:/app/.cache
+      - typhoon-ocr-cache:/app/.cache
     deploy:
       resources:
         reservations:
@@ -48,4 +48,6 @@ networks:
     external: true
 
 volumes:
-  hf-cache:
+  typhoon-ocr-cache:
+    external: true
+    name: "typhoon-ocr-cache"

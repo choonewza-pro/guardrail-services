@@ -17,7 +17,7 @@ services:
       - PORT=8088
       - DEVICE=cpu
     volumes:
-      - hf-cache:/app/.cache
+      - typhoon-ocr-cache:/app/.cache
     restart: unless-stopped
     healthcheck:
       test:
@@ -41,4 +41,6 @@ networks:
     external: true
 
 volumes:
-  hf-cache:
+  typhoon-ocr-cache:
+    external: true
+    name: "typhoon-ocr-cache"
